@@ -1,5 +1,5 @@
 #pragma once
-#define DEBUG
+//#define DEBUG
 
 #define LEDPIN LED_BUILTIN
 #define ONE_WIRE_BUS 7

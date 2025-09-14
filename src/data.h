@@ -2,13 +2,13 @@
 
 class Data {
     private:
-        double temperature;
+        float temperature;
         bool doorState;
         bool gateState;
 
     public:
-        double getTemperature();
-        void setTemperature(double _temperature);
+        float getTemperature();
+        void setTemperature(float _temperature);
         void writeToInputRegisters(uint16_t* inputRegisters, uint16_t startIndex);
 
         bool getDoorState();

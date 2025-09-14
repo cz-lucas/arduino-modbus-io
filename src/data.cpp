@@ -3,11 +3,11 @@
 #include "data.h"
 
 
-double Data::getTemperature() {
+float Data::getTemperature() {
     return temperature;
 }
 
-void Data::setTemperature(double _temperature) {
+void Data::setTemperature(float _temperature) {
     if(_temperature != -127) {
         this->temperature = _temperature;
     }
