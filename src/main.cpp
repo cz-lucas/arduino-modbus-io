@@ -2,7 +2,6 @@
 #include <build_info.h> // This will be auto-generated
 #include "config.h"
 #include "data.h"
-
 #include <SoftwareSerial.h>
 #include <ModbusRTUSlave.h>
 #include <OneWire.h>
@@ -18,16 +17,20 @@ ModbusRTUSlave modbus(MODBUS_SERIAL, MAX485_DERE);
 OneWire oneWire(ONE_WIRE_BUS);
 
 // SimpleTimers
-SimpleTimer digitalInputTimer(750);
-SimpleTimer DS18B20ReadTimer(10000);
+SimpleTimer digitalIoTimer(750);   // LED blinking timer
+SimpleTimer DS18B20ReadTimer(10000); // Temperature reading timer
+SimpleTimer wallboxTimer(1000);    // Wallbox timer to control the enable pin every 1 second
 
 // Data storage
 Data data;
 
+
 const uint8_t numCoils = 2;
+const uint8_t numDiscreteRegisters = 2;
 const uint8_t numInputRegisters = 2;
 
 // State tracking arrays
+bool discrete[numDiscreteRegisters];
 bool coils[numCoils];
 uint16_t inputRegisters[numInputRegisters];
 
@@ -76,18 +79,24 @@ inline void readDigitalSensors()
 {
   data.setDoorState(digitalRead(DOOR_CONTACT));
   data.setGateState(digitalRead(GATE_CONTACT));
-  coils[0] = data.getDoorState();
-  coils[1] = data.getGateState();
+  discrete[0] = data.getDoorState();
+  discrete[1] = data.getGateState();
+
+  // Set the wallbox pin state based on the coils[1] (could be controlled via Modbus)
+  digitalWrite(WALLBOX_ENABLE_PIN, coils[1]);
+  coils[1] = digitalRead(WALLBOX_ENABLE_PIN); // Track the pin state
 }
 
 void setup()
 {
   pinMode(LEDPIN, OUTPUT);
+  pinMode(WALLBOX_ENABLE_PIN, OUTPUT);
   pinMode(DOOR_CONTACT, INPUT_PULLUP);
   pinMode(GATE_CONTACT, INPUT_PULLUP);
   digitalWrite(LEDPIN, HIGH);
+  digitalWrite(WALLBOX_ENABLE_PIN, LOW);
 
-// Debugging setup (only if debug is enabled)
+  // Debugging setup (only if debug is enabled)
 #ifdef DEBUG
   DEBUG_SERIAL.begin(115200);
   DEBUG_SERIAL.println(F("Arduino modbus node"));
@@ -101,10 +110,11 @@ void setup()
   // Modbus initialization
   modbus.configureCoils(coils, numCoils);
   modbus.configureInputRegisters(inputRegisters, numInputRegisters);
+  modbus.configureDiscreteInputs(discrete, numDiscreteRegisters);
   MODBUS_SERIAL.begin(9600);
   modbus.begin(MODBUS_SLAVE_ID, MODBUS_BAUD, MODBUS_CONFIG);
 
-// OneWire setup
+  // OneWire setup
 #ifdef DEBUG
   DEBUG_SERIAL.println(F("[SETUP] Initializing onewire"));
 #endif
@@ -126,15 +136,24 @@ void loop()
   // Poll Modbus
   modbus.poll();
 
+  digitalWrite(WALLBOX_ENABLE_PIN, coils[0]);
+
   // Periodic sensor readings
   if (DS18B20ReadTimer.expired())
   {
     readDS18B20();
   }
-  
-  if (digitalInputTimer.expired())
+
+  // LED control (this is for blinking the LED)
+  if (digitalIoTimer.expired())
   {
-    digitalWrite(LEDPIN, !digitalRead(LEDPIN));
-    readDigitalSensors();
+    digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Toggle LED
+    readDigitalSensors(); // Read the digital sensors after LED toggle
   }
+
+  // Wallbox timer for periodic control (can add logic here if needed)
+  /*if (wallboxTimer.expired())
+  {
+    // Additional logic for periodic updates, if necessary
+  }*/
 }

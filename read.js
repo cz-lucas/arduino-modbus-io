@@ -27,9 +27,10 @@ const MBS_STATE_FAIL_CONNECT = "State fail (port)";
 
 // Modbus configuration values
 const mbsId = 15;
-const mbsScan = 1000;
+const mbsScan = 7000;
 const mbsTimeout = 5000;
 let mbsState = MBS_STATE_INIT;
+let toggle = false;
 
 // Upon SerialPort error
 client.on("error", function (error) {
@@ -60,7 +61,8 @@ const connectClient = function () {
 
 //==============================================================
 const readModbusData = function () {
-    client.readInputRegisters(0, 2) // Read 2 registers starting at address 0
+    toggle = !toggle;
+    /*client.readInputRegisters(0, 2) // Read 2 registers starting at address 0
         .then(function (data) {
             mbsState = MBS_STATE_GOOD_READ;
             mbsStatus = "success";
@@ -84,9 +86,9 @@ const readModbusData = function () {
             mbsState = MBS_STATE_FAIL_READ;
             mbsStatus = e.message;
             console.log(e);
-        });
+        });*/
 
-    /*client.readCoils(0, 2) // Read 2 registers starting at address 0
+    /*client.readDiscreteInputs(0, 2) // Read 2 registers starting at address 0
         .then(function (data) {
             mbsState = MBS_STATE_GOOD_READ;
             mbsStatus = "success";
@@ -102,6 +104,19 @@ const readModbusData = function () {
             mbsStatus = e.message;
             console.log(e);
         });*/
+
+    client.writeCoil(0, toggle) // Set state on coil 0 to the state of toggle
+        .then(function (data) {
+            mbsState = MBS_STATE_GOOD_READ;
+            mbsStatus = "success";
+
+            console.log(data);
+        })
+        .catch(function (e) {
+            mbsState = MBS_STATE_FAIL_READ;
+            mbsStatus = e.message;
+            console.log(e);
+        });
 };
 
 
