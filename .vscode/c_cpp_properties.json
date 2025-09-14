@@ -10,6 +10,9 @@
             "includePath": [
                 "/Users/lucasc/Documents/projects/arduino-modbus-io/include",
                 "/Users/lucasc/Documents/projects/arduino-modbus-io/src",
+                "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "/Users/lucasc/Documents/projects/arduino-modbus-io/.pio/libdeps/nanoatmega328/SimpleTimer/include",
+                "/Users/lucasc/Documents/projects/arduino-modbus-io/.pio/libdeps/nanoatmega328/SimpleTimer/src",
                 "/Users/lucasc/Documents/projects/arduino-modbus-io/.pio/libdeps/nanoatmega328/ModbusRTUSlave/src",
                 "/Users/lucasc/Documents/projects/arduino-modbus-io/.pio/libdeps/nanoatmega328/ModbusRTUComm/src",
                 "/Users/lucasc/Documents/projects/arduino-modbus-io/.pio/libdeps/nanoatmega328/ModbusSlaveLogic/src",
@@ -22,7 +25,6 @@
                 "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                 "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                 "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
-                "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                 "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                 ""
             ],
@@ -31,6 +33,9 @@
                 "path": [
                     "/Users/lucasc/Documents/projects/arduino-modbus-io/include",
                     "/Users/lucasc/Documents/projects/arduino-modbus-io/src",
+                    "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    "/Users/lucasc/Documents/projects/arduino-modbus-io/.pio/libdeps/nanoatmega328/SimpleTimer/include",
+                    "/Users/lucasc/Documents/projects/arduino-modbus-io/.pio/libdeps/nanoatmega328/SimpleTimer/src",
                     "/Users/lucasc/Documents/projects/arduino-modbus-io/.pio/libdeps/nanoatmega328/ModbusRTUSlave/src",
                     "/Users/lucasc/Documents/projects/arduino-modbus-io/.pio/libdeps/nanoatmega328/ModbusRTUComm/src",
                     "/Users/lucasc/Documents/projects/arduino-modbus-io/.pio/libdeps/nanoatmega328/ModbusSlaveLogic/src",
@@ -43,7 +48,6 @@
                     "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                     "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                     "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
-                    "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                     "/Users/lucasc/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                     ""
                 ]
