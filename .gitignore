@@ -10,3 +10,5 @@
 
 # End of https://www.toptal.com/developers/gitignore/api/platformio
 include/build_info.h
+
+node_modules

@@ -1,0 +1,28 @@
+{
+  "name": "arduino-modbus-io",
+  "version": "1.0.0",
+  "description": "An Arduino-based system for garage automation. Reads temperature from a DS18B20 sensor over Modbus and controls GPIOs for tasks like fan or light activation.",
+  "homepage": "https://github.com/cz-lucas/arduino-modbus-io#readme",
+  "bugs": {
+    "url": "https://github.com/cz-lucas/arduino-modbus-io/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cz-lucas/arduino-modbus-io.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "read.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "modbus-serial": "^8.0.21-no-serial-port",
+    "serialport": "^13.0.0"
+  }
+}
