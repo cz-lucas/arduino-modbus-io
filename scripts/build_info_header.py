@@ -19,6 +19,7 @@ with open(header_path, "w") as f:
     f.write(f'#ifndef BUILD_INFO_H\n')
     f.write(f'#define BUILD_INFO_H\n\n')
     f.write(f'#define GIT_COMMIT_HASH "{git_hash}"\n')
+    f.write(f'#define GIT_COMMIT_STRING "Commit: {git_hash}"\n')
     f.write(f'#define BUILD_TIMESTAMP "{timestamp}"\n\n')
     f.write(f'#endif // BUILD_INFO_H\n')
 

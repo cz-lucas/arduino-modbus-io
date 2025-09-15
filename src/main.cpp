@@ -7,23 +7,23 @@
 #include <OneWire.h>
 #include "SimpleTimer.h"
 
+#if !(defined(BOARD) && BOARD == ATmega8)
 // SoftwareSerial setup for Modbus
 SoftwareSerial swSerial(MODBUS_RX, MODBUS_TX);
-#define MODBUS_SERIAL swSerial
-#define DEBUG_SERIAL Serial
+#endif
+
 ModbusRTUSlave modbus(MODBUS_SERIAL, MAX485_DERE);
 
 // OneWire setup for DS18B20 temperature sensor
 OneWire oneWire(ONE_WIRE_BUS);
 
 // SimpleTimers
-SimpleTimer digitalIoTimer(750);   // LED blinking timer
+SimpleTimer digitalIoTimer(750);     // LED blinking timer
 SimpleTimer DS18B20ReadTimer(10000); // Temperature reading timer
-SimpleTimer wallboxTimer(1000);    // Wallbox timer to control the enable pin every 1 second
+SimpleTimer wallboxTimer(1000);      // Wallbox timer to control the enable pin every 1 second
 
 // Data storage
 Data data;
-
 
 const uint8_t numCoils = 2;
 const uint8_t numDiscreteRegisters = 2;
@@ -91,6 +91,8 @@ void setup()
 {
   pinMode(LEDPIN, OUTPUT);
   pinMode(WALLBOX_ENABLE_PIN, OUTPUT);
+  pinMode(MAX485_DERE, OUTPUT);
+  digitalWrite(MAX485_DERE, LOW);
   pinMode(DOOR_CONTACT, INPUT_PULLUP);
   pinMode(GATE_CONTACT, INPUT_PULLUP);
   digitalWrite(LEDPIN, HIGH);
@@ -107,11 +109,18 @@ void setup()
   DEBUG_SERIAL.println(F("[SETUP] Initializing modbus"));
 #endif
 
+  MODBUS_SERIAL.begin(9600);
+  #ifndef DEBUG
+  delay(20);
+  DEBUG_SERIAL.println(GIT_COMMIT_STRING);
+  DEBUG_SERIAL.flush();
+  #endif
+  delay(50);
+
   // Modbus initialization
   modbus.configureCoils(coils, numCoils);
   modbus.configureInputRegisters(inputRegisters, numInputRegisters);
   modbus.configureDiscreteInputs(discrete, numDiscreteRegisters);
-  MODBUS_SERIAL.begin(9600);
   modbus.begin(MODBUS_SLAVE_ID, MODBUS_BAUD, MODBUS_CONFIG);
 
   // OneWire setup
@@ -148,7 +157,7 @@ void loop()
   if (digitalIoTimer.expired())
   {
     digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Toggle LED
-    readDigitalSensors(); // Read the digital sensors after LED toggle
+    readDigitalSensors();                       // Read the digital sensors after LED toggle
   }
 
   // Wallbox timer for periodic control (can add logic here if needed)

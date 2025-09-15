@@ -45,7 +45,7 @@ const connectClient = function () {
     client.setTimeout(mbsTimeout);
 
     // try to connect
-    client.connectRTUBuffered("/dev/tty.usbserial-3120", { baudRate: 9600, parity: "none", dataBits: 8, stopBits: 1 })
+    client.connectRTUBuffered("/dev/tty.usbserial-3140", { baudRate: 9600, parity: "none", dataBits: 8, stopBits: 1 })
         .then(function () {
             mbsState = MBS_STATE_GOOD_CONNECT;
             mbsStatus = "Connected, wait for reading...";
