@@ -11,10 +11,16 @@
 #define MODBUS_CONFIG SERIAL_8N1
 #define MODBUS_SLAVE_ID 15
 
+#define NUM_INPUT_PINS 6
+#define NUM_OUTPUT_PINS 6
+
 #if defined(BOARD) && BOARD == ATmega8
 
-#define LEDPIN 13
-#define ONE_WIRE_BUS 7
+#define LEDPIN PD2
+#define ONE_WIRE_BUS PD3
+
+const uint8_t INPUT_PINS[NUM_INPUT_PINS] = {PB0, PB1, PB2, PB3, PB4, PB5};
+const uint8_t OUTPUT_PINS[NUM_OUTPUT_PINS] = {PC0, PC1, PC2, PC3, PC4, PC5};
 
 #define MODBUS_SERIAL Serial
 #define DEBUG_SERIAL Serial
@@ -22,8 +28,11 @@
 
 #else
 
-#define LEDPIN 13
+#define LEDPIN LED_BUILTIN
 #define ONE_WIRE_BUS 7
+
+const uint8_t INPUT_PINS[NUM_INPUT_PINS] = {8, 9, 2, 3, 4, 5};
+const uint8_t OUTPUT_PINS[NUM_OUTPUT_PINS] = {10, 11, 12, A0, A1, A2};
 
 #define MODBUS_SERIAL swSerial
 #define DEBUG_SERIAL Serial

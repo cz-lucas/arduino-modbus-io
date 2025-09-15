@@ -18,8 +18,8 @@ ModbusRTUSlave modbus(MODBUS_SERIAL, MAX485_DERE);
 OneWire oneWire(ONE_WIRE_BUS);
 
 // SimpleTimers
-SimpleTimer digitalIoTimer(750);     // LED blinking timer
-SimpleTimer DS18B20ReadTimer(10000); // Temperature reading timer
+SimpleTimer digitalIoTimer(250);     // LED blinking timer
+SimpleTimer DS18B20ReadTimer(60000); // Temperature reading timer
 SimpleTimer wallboxTimer(1000);      // Wallbox timer to control the enable pin every 1 second
 
 // Data storage
@@ -75,28 +75,35 @@ inline void readDS18B20()
   data.writeToInputRegisters(inputRegisters, 0);
 }
 
-inline void readDigitalSensors()
+inline void readWriteDigitalPins()
 {
-  data.setDoorState(digitalRead(DOOR_CONTACT));
-  data.setGateState(digitalRead(GATE_CONTACT));
-  discrete[0] = data.getDoorState();
-  discrete[1] = data.getGateState();
-
-  // Set the wallbox pin state based on the coils[1] (could be controlled via Modbus)
-  digitalWrite(WALLBOX_ENABLE_PIN, coils[1]);
-  coils[1] = digitalRead(WALLBOX_ENABLE_PIN); // Track the pin state
+    // Read all inputs into discrete[]
+    for (uint8_t i = 0; i < NUM_INPUT_PINS; i++) {
+        discrete[i] = !digitalRead(INPUT_PINS[i]); // invert if using INPUT_PULLUP
+    }
+    // Write all outputs from coils[]
+    for (uint8_t i = 0; i < NUM_OUTPUT_PINS; i++) {
+        digitalWrite(OUTPUT_PINS[i], coils[i]);
+        coils[i] = digitalRead(OUTPUT_PINS[i]); // for feedback, optional
+    }
 }
 
 void setup()
 {
   pinMode(LEDPIN, OUTPUT);
-  pinMode(WALLBOX_ENABLE_PIN, OUTPUT);
   pinMode(MAX485_DERE, OUTPUT);
   digitalWrite(MAX485_DERE, LOW);
-  pinMode(DOOR_CONTACT, INPUT_PULLUP);
-  pinMode(GATE_CONTACT, INPUT_PULLUP);
   digitalWrite(LEDPIN, HIGH);
-  digitalWrite(WALLBOX_ENABLE_PIN, LOW);
+
+    // Set all input pins
+    for (uint8_t i = 0; i < NUM_INPUT_PINS; i++) {
+        pinMode(INPUT_PINS[i], INPUT_PULLUP);
+    }
+    // Set all output pins
+    for (uint8_t i = 0; i < NUM_OUTPUT_PINS; i++) {
+        pinMode(OUTPUT_PINS[i], OUTPUT);
+        digitalWrite(OUTPUT_PINS[i], LOW);
+    }
 
   // Debugging setup (only if debug is enabled)
 #ifdef DEBUG
@@ -132,7 +139,7 @@ void setup()
   DEBUG_SERIAL.println(F("[SETUP] Reading sensors"));
 #endif
   readDS18B20();        // Read temperature from DS18B20
-  readDigitalSensors(); // Read digital sensors
+  readWriteDigitalPins(); // Read digital sensors
 
 #ifdef DEBUG
   DEBUG_SERIAL.println(F("[SETUP] Setup complete"));
@@ -157,7 +164,7 @@ void loop()
   if (digitalIoTimer.expired())
   {
     digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Toggle LED
-    readDigitalSensors();                       // Read the digital sensors after LED toggle
+    readWriteDigitalPins();                       // Read the digital sensors after LED toggle
   }
 
   // Wallbox timer for periodic control (can add logic here if needed)
