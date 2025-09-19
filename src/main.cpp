@@ -19,7 +19,7 @@ OneWire oneWire(ONE_WIRE_BUS);
 
 // SimpleTimers
 SimpleTimer digitalIoTimer(250);     // LED blinking timer
-SimpleTimer DS18B20ReadTimer(60000); // Temperature reading timer
+SimpleTimer DS18B20ReadTimer(30000); // Temperature reading timer
 SimpleTimer wallboxTimer(1000);      // Wallbox timer to control the enable pin every 1 second
 
 // Data storage
@@ -73,19 +73,13 @@ inline void readDS18B20()
 
   // Write the temperature to the input registers
   data.writeToInputRegisters(inputRegisters, 0);
+
+  oneWire.reset();
 }
 
 inline void readWriteDigitalPins()
 {
-    // Read all inputs into discrete[]
-    for (uint8_t i = 0; i < NUM_INPUT_PINS; i++) {
-        discrete[i] = !digitalRead(INPUT_PINS[i]); // invert if using INPUT_PULLUP
-    }
-    // Write all outputs from coils[]
-    for (uint8_t i = 0; i < NUM_OUTPUT_PINS; i++) {
-        digitalWrite(OUTPUT_PINS[i], coils[i]);
-        coils[i] = digitalRead(OUTPUT_PINS[i]); // for feedback, optional
-    }
+  yield();
 }
 
 void setup()
@@ -94,16 +88,15 @@ void setup()
   pinMode(MAX485_DERE, OUTPUT);
   digitalWrite(MAX485_DERE, LOW);
   digitalWrite(LEDPIN, HIGH);
+  sei();  // Disable interrupts
 
-    // Set all input pins
-    for (uint8_t i = 0; i < NUM_INPUT_PINS; i++) {
-        pinMode(INPUT_PINS[i], INPUT_PULLUP);
-    }
-    // Set all output pins
-    for (uint8_t i = 0; i < NUM_OUTPUT_PINS; i++) {
-        pinMode(OUTPUT_PINS[i], OUTPUT);
-        digitalWrite(OUTPUT_PINS[i], LOW);
-    }
+#ifndef DEBUG
+  for (uint8_t i = 0; i < 5; i++)
+  {
+    digitalWrite(LEDPIN, !digitalRead(LEDPIN));
+    delay(100);
+  }
+#endif
 
   // Debugging setup (only if debug is enabled)
 #ifdef DEBUG
@@ -117,32 +110,46 @@ void setup()
 #endif
 
   MODBUS_SERIAL.begin(9600);
-  #ifndef DEBUG
+#ifndef DEBUG
   delay(20);
   DEBUG_SERIAL.println(GIT_COMMIT_STRING);
   DEBUG_SERIAL.flush();
-  #endif
+#endif
   delay(50);
-
   // Modbus initialization
   modbus.configureCoils(coils, numCoils);
   modbus.configureInputRegisters(inputRegisters, numInputRegisters);
   modbus.configureDiscreteInputs(discrete, numDiscreteRegisters);
+  modbus.setResponseDelay(150);
   modbus.begin(MODBUS_SLAVE_ID, MODBUS_BAUD, MODBUS_CONFIG);
-
+DEBUG_SERIAL.println("2");
   // OneWire setup
 #ifdef DEBUG
   DEBUG_SERIAL.println(F("[SETUP] Initializing onewire"));
 #endif
 
+#ifndef DEBUG
+  for (uint8_t i = 0; i < 3; i++)
+  {
+    digitalWrite(LEDPIN, !digitalRead(LEDPIN));
+    delay(300);
+  }
+#endif
 #ifdef DEBUG
   DEBUG_SERIAL.println(F("[SETUP] Reading sensors"));
 #endif
-  readDS18B20();        // Read temperature from DS18B20
-  readWriteDigitalPins(); // Read digital sensors
-
+  readDS18B20();          // Read temperature from DS18B20
+  //readWriteDigitalPins(); // Read digital sensors
 #ifdef DEBUG
   DEBUG_SERIAL.println(F("[SETUP] Setup complete"));
+#endif
+
+#ifndef DEBUG
+  for (uint8_t i = 0; i < 3; i++)
+  {
+    digitalWrite(LEDPIN, !digitalRead(LEDPIN));
+    delay(500);
+  }
 #endif
   digitalWrite(LEDPIN, LOW);
 }
@@ -152,7 +159,7 @@ void loop()
   // Poll Modbus
   modbus.poll();
 
-  digitalWrite(WALLBOX_ENABLE_PIN, coils[0]);
+  yield();
 
   // Periodic sensor readings
   if (DS18B20ReadTimer.expired())
@@ -164,7 +171,7 @@ void loop()
   if (digitalIoTimer.expired())
   {
     digitalWrite(LEDPIN, !digitalRead(LEDPIN)); // Toggle LED
-    readWriteDigitalPins();                       // Read the digital sensors after LED toggle
+    readWriteDigitalPins();                     // Read the digital sensors after LED toggle
   }
 
   // Wallbox timer for periodic control (can add logic here if needed)

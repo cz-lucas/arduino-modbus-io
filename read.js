@@ -26,9 +26,9 @@ const MBS_STATE_GOOD_CONNECT = "State good (port)";
 const MBS_STATE_FAIL_CONNECT = "State fail (port)";
 
 // Modbus configuration values
-const mbsId = 15;
-const mbsScan = 7000;
-const mbsTimeout = 5000;
+const mbsId = 11;
+const mbsScan = 3000;
+const mbsTimeout = 500;
 let mbsState = MBS_STATE_INIT;
 let toggle = false;
 
@@ -45,7 +45,7 @@ const connectClient = function () {
     client.setTimeout(mbsTimeout);
 
     // try to connect
-    client.connectRTUBuffered("/dev/tty.usbserial-3140", { baudRate: 9600, parity: "none", dataBits: 8, stopBits: 1 })
+    client.connectRTUBuffered("COM4", { baudRate: 9600, parity: "none", dataBits: 8, stopBits: 1 })
         .then(function () {
             mbsState = MBS_STATE_GOOD_CONNECT;
             mbsStatus = "Connected, wait for reading...";
@@ -62,7 +62,7 @@ const connectClient = function () {
 //==============================================================
 const readModbusData = function () {
     toggle = !toggle;
-    /*client.readInputRegisters(0, 2) // Read 2 registers starting at address 0
+    client.readInputRegisters(0, 2) // Read 2 registers starting at address 0
         .then(function (data) {
             mbsState = MBS_STATE_GOOD_READ;
             mbsStatus = "success";
@@ -86,7 +86,7 @@ const readModbusData = function () {
             mbsState = MBS_STATE_FAIL_READ;
             mbsStatus = e.message;
             console.log(e);
-        });*/
+        });
 
     /*client.readDiscreteInputs(0, 2) // Read 2 registers starting at address 0
         .then(function (data) {
@@ -105,7 +105,7 @@ const readModbusData = function () {
             console.log(e);
         });*/
 
-    client.writeCoil(0, toggle) // Set state on coil 0 to the state of toggle
+    /*client.writeCoil(0, toggle) // Set state on coil 0 to the state of toggle
         .then(function (data) {
             mbsState = MBS_STATE_GOOD_READ;
             mbsStatus = "success";
@@ -116,7 +116,7 @@ const readModbusData = function () {
             mbsState = MBS_STATE_FAIL_READ;
             mbsStatus = e.message;
             console.log(e);
-        });
+        });*/
 };
 
 
