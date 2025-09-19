@@ -19,14 +19,6 @@ void Data::writeToInputRegisters(uint16_t* inputRegisters, uint16_t startIndex) 
     inputRegisters[startIndex + 1] = static_cast<uint16_t>(scaledTemp & 0xFFFF);       // Low word
 }
 
-bool Data::getDoorState() {
-    return this->doorState;
-}
-
-void Data::setDoorState(bool _state) {
-    this->doorState = !_state;
-}
-
 bool Data::getGateState() {
     return this->gateState;
 }

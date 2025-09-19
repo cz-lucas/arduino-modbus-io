@@ -11,9 +11,6 @@ class Data {
         void setTemperature(float _temperature);
         void writeToInputRegisters(uint16_t* inputRegisters, uint16_t startIndex);
 
-        bool getDoorState();
-        void setDoorState(bool _state);
-
         bool getGateState();
         void setGateState(bool _state);
 };

@@ -62,7 +62,7 @@ const connectClient = function () {
 //==============================================================
 const readModbusData = function () {
     toggle = !toggle;
-    client.readInputRegisters(0, 2) // Read 2 registers starting at address 0
+    /*client.readInputRegisters(0, 2) // Read 2 registers starting at address 0
         .then(function (data) {
             mbsState = MBS_STATE_GOOD_READ;
             mbsStatus = "success";
@@ -86,24 +86,22 @@ const readModbusData = function () {
             mbsState = MBS_STATE_FAIL_READ;
             mbsStatus = e.message;
             console.log(e);
-        });
+        });*/
 
-    /*client.readDiscreteInputs(0, 2) // Read 2 registers starting at address 0
+    client.readDiscreteInputs(0, 1) // Read 2 registers starting at address 0
         .then(function (data) {
             mbsState = MBS_STATE_GOOD_READ;
             mbsStatus = "success";
 
-            const door = data.data[0];
-            const gate = data.data[1];
+            const gate = data.data[0];
 
-            console.log(`Door: ${door}`);
             console.log(`Gate: ${gate}`);
         })
         .catch(function (e) {
             mbsState = MBS_STATE_FAIL_READ;
             mbsStatus = e.message;
             console.log(e);
-        });*/
+        });
 
     /*client.writeCoil(0, toggle) // Set state on coil 0 to the state of toggle
         .then(function (data) {
