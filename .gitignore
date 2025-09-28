@@ -12,3 +12,7 @@
 include/build_info.h
 
 node_modules
+
+.DS_Store
+*.afphoto
+*.psd
